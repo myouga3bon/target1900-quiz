@@ -1,5 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>ターゲット1900 単語テスト</title>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><title>ターゲット1900 単語テスト</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" href="icon-192.png" type="image/png" sizes="192x192">
@@ -11,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Merriweather:wght@700;900&display=swap" rel="stylesheet">
+</head><body>
 <style>
   :root{
     --bg:#EEF4FF;
@@ -850,6 +850,16 @@
 
       <button type="button" class="btn btn-primary" id="weakStartBtn" disabled>この苦手単語でトレーニングを始める</button>
       <button type="button" class="btn btn-secondary" id="weakBackBtn" style="margin-top:10px;width:100%;">設定に戻る</button>
+
+      <div class="field-block" style="margin-top:22px;">
+        <p class="summary-line" style="margin:0 0 8px;">苦手単語データのバックアップ（この端末にのみ保存されるため、機種変更やブラウザのデータ削除に備えて、たまに保存をおすすめします）</p>
+        <div class="btn-row" style="margin-top:0;">
+          <button type="button" class="btn btn-secondary" id="weakExportBtn">📤 バックアップを保存</button>
+          <button type="button" class="btn btn-secondary" id="weakImportBtn">📥 バックアップを復元</button>
+        </div>
+        <input type="file" id="weakImportFile" accept="application/json" hidden>
+        <p class="summary-line" id="weakImportMsg" style="margin-top:8px;"></p>
+      </div>
     </div>
   </section>
 </div>
@@ -960,6 +970,66 @@ function applyWeakSessionResults(){
   });
   saveWeakStore(store);
   return graduated;
+}
+function exportWeakStore(){
+  const msg = $('weakImportMsg');
+  try{
+    const store = loadWeakStore();
+    const payload = {app:'target1900-quiz', type:'weak-words-backup', exportedAt:new Date().toISOString(), data:store};
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const d = new Date();
+    const stamp = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+    a.href = url;
+    a.download = `target1900-weak-backup-${stamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url), 2000);
+    if(msg){ msg.textContent = 'バックアップファイルを保存しました。'; msg.style.color = 'var(--success-ink)'; }
+  }catch(e){
+    if(msg){ msg.textContent = 'バックアップの保存に失敗しました。'; msg.style.color = 'var(--danger-ink)'; }
+  }
+}
+function importWeakStoreFromFile(file){
+  const msg = $('weakImportMsg');
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(){
+    try{
+      const parsed = JSON.parse(reader.result);
+      const incoming = (parsed && parsed.data && typeof parsed.data === 'object') ? parsed.data : parsed;
+      if(!incoming || typeof incoming !== 'object') throw new Error('invalid backup file');
+      const current = loadWeakStore();
+      let count = 0;
+      Object.keys(incoming).forEach(k=>{
+        const inc = incoming[k];
+        if(!inc || typeof inc.no === 'undefined') return;
+        count++;
+        const cur = current[k];
+        if(!cur){
+          current[k] = {no:inc.no, wrong:inc.wrong||0, mastery:inc.mastery||0, lastWrongAt:inc.lastWrongAt||0};
+        } else {
+          current[k] = {
+            no: cur.no,
+            wrong: Math.max(cur.wrong||0, inc.wrong||0),
+            mastery: Math.max(cur.mastery||0, inc.mastery||0),
+            lastWrongAt: Math.max(cur.lastWrongAt||0, inc.lastWrongAt||0)
+          };
+        }
+      });
+      saveWeakStore(current);
+      renderWeakScreen();
+      if(msg){ msg.textContent = `復元しました（${count}語分を読み込みました）。`; msg.style.color = 'var(--success-ink)'; }
+    }catch(e){
+      if(msg){ msg.textContent = 'ファイルを読み込めませんでした。バックアップ用のJSONファイルを選んでください。'; msg.style.color = 'var(--danger-ink)'; }
+    }
+  };
+  reader.onerror = function(){
+    if(msg){ msg.textContent = 'ファイルの読み込み中にエラーが発生しました。'; msg.style.color = 'var(--danger-ink)'; }
+  };
+  reader.readAsText(file);
 }
 function renderWeakScreen(){
   const list = getWeakList();
@@ -1654,6 +1724,13 @@ function wireEvents(){
   document.querySelectorAll('input[name="weakSize"]').forEach(el=>{
     el.addEventListener('change', renderWeakScreen);
   });
+  $('weakExportBtn').addEventListener('click', exportWeakStore);
+  $('weakImportBtn').addEventListener('click', ()=>{ $('weakImportFile').click(); });
+  $('weakImportFile').addEventListener('change', (e)=>{
+    const file = e.target.files && e.target.files[0];
+    importWeakStoreFromFile(file);
+    e.target.value = '';
+  });
 }
 
 function getSnapshotData(){
@@ -1741,7 +1818,18 @@ function restoreFromSnapshot(data){
   }
 }
 
+function requestPersistentStorage(){
+  /* Best-effort: ask the browser not to evict this site's localStorage under
+     storage pressure. Supported by modern Safari/iOS and Chrome; a no-op
+     (silently ignored) everywhere else. */
+  try{
+    if(navigator.storage && navigator.storage.persist){
+      navigator.storage.persist().catch(()=>{});
+    }
+  }catch(e){}
+}
 function start(initialData){
+  requestPersistentStorage();
   populateRangeSelect(document.querySelector('input[name="chunk"]:checked').value);
   wireEvents();
   try{
