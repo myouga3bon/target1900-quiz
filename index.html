@@ -971,18 +971,39 @@ function applyWeakSessionResults(){
   saveWeakStore(store);
   return graduated;
 }
-function exportWeakStore(){
+async function exportWeakStore(){
   const msg = $('weakImportMsg');
+  const store = loadWeakStore();
+  const payload = {app:'target1900-quiz', type:'weak-words-backup', exportedAt:new Date().toISOString(), data:store};
+  const text = JSON.stringify(payload, null, 2);
+  const d = new Date();
+  const stamp = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+  const filename = `target1900-weak-backup-${stamp}.json`;
+
+  /* Inside a published Claude Artifact, a plain <a download> link is not
+     granted by the viewer sandbox and silently does nothing, so use the
+     platform's downloads capability there. Outside it (e.g. on GitHub
+     Pages, where window.claude is undefined) fall back to a normal
+     browser download. */
+  if(window.claude && typeof window.claude.use === 'function'){
+    try{
+      const downloads = await window.claude.use('downloads');
+      if(downloads){
+        await downloads.save({filename, data: text});
+        if(msg){ msg.textContent = 'バックアップファイルを保存しました。'; msg.style.color = 'var(--success-ink)'; }
+        return;
+      }
+    }catch(e){
+      if(msg){ msg.textContent = 'バックアップの保存をキャンセルしたか、保存できませんでした。'; msg.style.color = 'var(--danger-ink)'; }
+      return;
+    }
+  }
   try{
-    const store = loadWeakStore();
-    const payload = {app:'target1900-quiz', type:'weak-words-backup', exportedAt:new Date().toISOString(), data:store};
-    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+    const blob = new Blob([text], {type:'application/json'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    const d = new Date();
-    const stamp = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
     a.href = url;
-    a.download = `target1900-weak-backup-${stamp}.json`;
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
