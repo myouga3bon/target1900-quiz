@@ -3,35 +3,35 @@
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" href="icon-192.png" type="image/png" sizes="192x192">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta name="theme-color" content="#1B4FCB">
+<meta name="theme-color" content="#C23570">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TARGET1900">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Merriweather:wght@700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Klee+One:wght@400;600&display=swap" rel="stylesheet">
 </head><body>
 <style>
   :root{
-    --bg:#EEF4FF;
+    --bg:#F6F3F4;
     --surface:#FFFFFF;
-    --surface-alt:#E3ECFF;
-    --ink:#16213E;
-    --ink-soft:#5C6B8C;
-    --border:#C4D6FB;
-    --border-soft:#DEE9FE;
-    --accent:#2F6FED;
-    --accent-strong:#1B4FCB;
+    --surface-alt:#F4E6EC;
+    --ink:#3A3237;
+    --ink-soft:#867D83;
+    --border:#E2D2D9;
+    --border-soft:#EEE3E7;
+    --accent:#E8508B;
+    --accent-strong:#C23570;
     --accent-ink:#FFFFFF;
-    --accent-soft:#DCE7FF;
+    --accent-soft:#FDE0EC;
     --success:#2FA76B;
     --success-soft:#E1F5E9;
     --success-ink:#12401F;
     --danger:#E0403F;
     --danger-soft:#FBDEDD;
     --danger-ink:#5C1512;
-    --gold:#C2751E;
-    --shadow: 0 1px 2px rgba(27,79,203,.07), 0 10px 26px rgba(27,79,203,.10);
+    --gold:#6E6670;
+    --shadow: 0 1px 2px rgba(80,55,65,.08), 0 10px 26px rgba(80,55,65,.12);
   }
 
   *{box-sizing:border-box;}
@@ -39,7 +39,7 @@
     margin:0;
     background:var(--bg);
     color:var(--ink);
-    font-family:'Zen Kaku Gothic New', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    font-family:'Klee One', 'Hiragino Sans', 'Yu Gothic', sans-serif;
     -webkit-font-smoothing:antialiased;
   }
   .shell{
@@ -53,6 +53,9 @@
     gap:4px;
     margin-bottom:12px;
   }
+  .app-header, #screen-setup{
+    font-family:'Kosugi Maru', 'Hiragino Maru Gothic ProN', sans-serif;
+  }
   .eyebrow{
     font-size:12px;
     font-weight:700;
@@ -61,7 +64,6 @@
     text-transform:uppercase;
   }
   h1.app-title{
-    font-family:'Merriweather', 'Shippori Mincho', serif;
     font-weight:900;
     font-size:clamp(24px,6vw,32px);
     margin:0;
@@ -292,7 +294,6 @@
     border-radius:999px;
   }
   .timer-num{
-    font-family:'Shippori Mincho', serif;
     font-weight:800;
     font-size:20px;
     color:var(--danger);
@@ -324,7 +325,6 @@
     margin:0 0 4px;
   }
   .word-text{
-    font-family:'Merriweather', Georgia, serif;
     font-weight:900;
     font-size:clamp(24px,7vw,36px);
     line-height:1.25;
@@ -364,7 +364,6 @@
   .choice-btn:active:not(:disabled){ transform:translateY(1px); }
   .choice-btn:disabled{ cursor:default; }
   .choice-num{
-    font-family:'Shippori Mincho', serif;
     font-weight:700;
     color:var(--accent-strong);
     flex:0 0 auto;
@@ -402,7 +401,6 @@
     white-space:nowrap;
   }
   .callout-num{
-    font-family:'Shippori Mincho', serif;
     font-weight:800;
     flex:0 0 auto;
   }
@@ -419,7 +417,6 @@
   }
   .score-block{ text-align:left; }
   .score-ring{
-    font-family:'Merriweather', 'Shippori Mincho', serif;
     font-weight:900;
     font-size:48px;
     color:var(--accent-strong);
@@ -472,7 +469,7 @@
     letter-spacing:.04em;
   }
   table.mistake-table td.num{ font-variant-numeric:tabular-nums; color:var(--ink-soft); width:36px; }
-  table.mistake-table td.word{ font-family:'Merriweather', Georgia, serif; font-weight:700; white-space:normal; min-width:88px; }
+  table.mistake-table td.word{ font-weight:700; white-space:normal; min-width:88px; }
   table.mistake-table td.count{ text-align:right; color:var(--danger); font-weight:700; font-variant-numeric:tabular-nums; width:52px; white-space:nowrap; }
 
   /* Confetti */
@@ -517,14 +514,12 @@
   .btn-report:focus-visible{ outline:2px solid var(--accent-strong); outline-offset:2px; }
 
   .report-title{
-    font-family:'Merriweather', 'Shippori Mincho', serif;
     font-weight:900;
     font-size:20px;
     margin:0 0 2px;
     color:var(--accent-strong);
   }
   .report-date{
-    font-family:'Merriweather', 'Shippori Mincho', serif;
     font-weight:900;
     font-size:clamp(26px,8vw,36px);
     line-height:1.2;
@@ -554,7 +549,6 @@
   }
   .report-stat-num{
     display:block;
-    font-family:'Merriweather', 'Shippori Mincho', serif;
     font-weight:900;
     font-size:20px;
     color:var(--accent-strong);
@@ -593,7 +587,7 @@
     align-items:center;
     justify-content:center;
     gap:9px;
-    background:linear-gradient(135deg,var(--gold),#E0982E);
+    background:linear-gradient(135deg,var(--gold),#938C96);
     color:#FFFFFF;
     font:inherit;
     font-weight:800;
@@ -621,7 +615,7 @@
     margin:0 0 16px;
   }
   .weak-rank-table td.rank{ font-variant-numeric:tabular-nums; color:var(--ink-soft); width:30px; }
-  .weak-rank-table td.word{ font-family:'Merriweather', Georgia, serif; font-weight:700; white-space:normal; min-width:72px; }
+  .weak-rank-table td.word{ font-weight:700; white-space:normal; min-width:72px; }
   .weak-rank-table td.mastery{ text-align:right; color:var(--accent-strong); font-weight:700; font-variant-numeric:tabular-nums; width:48px; white-space:nowrap; }
   .weak-empty{
     padding:22px 14px;
